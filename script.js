@@ -1,5 +1,8 @@
 // ── State ────────────────────────────────────────────────────
-let tasks = [];
+const STORAGE_KEY = 'myTasks';
+
+// Baca teks JSON dari storage, lalu terjemahkan kembali jadi Array (fallback [] jika null)
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let currentFilter = 'all';
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -7,6 +10,11 @@ function getTodayString() {
   return new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+}
+
+// WAJIB: Ubah Array of Objects menjadi String JSON sebelum disimpan ke storage!
+function saveTasks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
 // ── Render ───────────────────────────────────────────────────
@@ -26,11 +34,12 @@ function render() {
     return;
   }
 
+  // id task langsung dipakai sebagai id elemen <li>, jadi tidak butuh atribut data-* untuk menandainya.
   list.innerHTML = filtered.map(task => `
-    <li class="task-card" data-id="${task.id}">
-      <div class="task-check ${task.done ? 'checked' : ''}" data-action="toggle"></div>
-      <span class="task-text ${task.done ? 'done' : ''}" data-action="toggle">${task.text}</span>
-      <button class="delete-btn" data-action="delete">delete</button>
+    <li class="task-card" id="${task.id}">
+      <div class="task-check ${task.done ? 'checked' : ''}"></div>
+      <span class="task-text ${task.done ? 'done' : ''}">${task.text}</span>
+      <button class="delete-btn">delete</button>
     </li>
   `).join('');
 }
@@ -49,6 +58,7 @@ function addTask() {
   });
 
   input.value = '';
+  saveTasks(); // Setiap ada tambah task, update juga data di localStorage
   render();
 }
 
@@ -60,21 +70,29 @@ document.getElementById('task-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') addTask();
 });
 
+// Event Delegation: satu listener di parent (#task-list), lalu dicek pakai .matches()
 document.getElementById('task-list').addEventListener('click', (e) => {
-  const card = e.target.closest('[data-id]');
+  const card = e.target.closest('.task-card');
   if (!card) return;
 
-  const id = Number(card.dataset.id);
-  const action = e.target.dataset.action;
+  const id = Number(card.id);
 
-  if (action === 'delete') {
+  // A. Klik tombol Delete
+  if (e.target.matches('.delete-btn')) {
     tasks = tasks.filter(t => t.id !== id);
+    saveTasks(); // Setiap ada hapus task, update juga data di localStorage
     render();
   }
 
-  if (action === 'toggle') {
-    const task = tasks.find(t => t.id === id);
-    if (task) task.done = !task.done;
+  // B. Klik checkbox atau teks task -> tandai selesai/belum (coret)
+  if (e.target.matches('.task-check') || e.target.matches('.task-text')) {
+    for (let i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) {
+        tasks[i].done = !tasks[i].done;
+        break;
+      }
+    }
+    saveTasks();
     render();
   }
 });
