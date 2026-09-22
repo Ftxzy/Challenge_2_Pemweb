@@ -21,13 +21,19 @@ function saveTasks() {
 function render() {
   const list = document.getElementById('task-list');
 
-  const filtered = currentFilter === 'completed'
-    ? tasks.filter(t => t.done)
-    : tasks;
+  let filtered;
+  if (currentFilter === 'completed') {
+    filtered = tasks.filter(t => t.done);
+  } else if (currentFilter === 'active') {
+    filtered = tasks.filter(t => !t.done);
+  } else {
+    filtered = tasks;
+  }
 
   // Update counts
   document.getElementById('count-all').textContent = tasks.length;
   document.getElementById('count-completed').textContent = tasks.filter(t => t.done).length;
+  document.getElementById('count-active').textContent = tasks.filter(t => !t.done).length;
 
   if (filtered.length === 0) {
     list.innerHTML = '<li class="empty">No tasks here.</li>';
@@ -101,6 +107,7 @@ document.getElementById('filter-all').addEventListener('click', () => {
   currentFilter = 'all';
   document.getElementById('filter-all').classList.add('active');
   document.getElementById('filter-completed').classList.remove('active');
+  document.getElementById('filter-active').classList.remove('active'); // baris baru
   render();
 });
 
@@ -108,6 +115,15 @@ document.getElementById('filter-completed').addEventListener('click', () => {
   currentFilter = 'completed';
   document.getElementById('filter-completed').classList.add('active');
   document.getElementById('filter-all').classList.remove('active');
+  document.getElementById('filter-active').classList.remove('active'); // baris baru
+  render();
+});
+
+document.getElementById('filter-active').addEventListener('click', () => {
+  currentFilter = 'active';
+  document.getElementById('filter-active').classList.add('active');
+  document.getElementById('filter-all').classList.remove('active');
+  document.getElementById('filter-completed').classList.remove('active');
   render();
 });
 
