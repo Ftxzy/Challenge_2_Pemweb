@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tasks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div>
+        <h1>My Tasks</h1>
+        <div class="date" id="today-date"></div>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" id="filter-all">All Tasks (<span id="count-all">0</span>)</button>
+        <button class="filter-btn" id="filter-completed">Completed (<span id="count-completed">0</span>)</button>
+      </div>
+    </div>
+
+    <div class="add-row">
+      <input type="text" id="task-input" placeholder="Add Task" />
+      <button class="add-btn" id="add-btn">+ Add New Task</button>
+    </div>
+
+    <ul class="task-list" id="task-list"></ul>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
